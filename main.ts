@@ -5,7 +5,6 @@ import {
 	EditorView,
 	ViewPlugin,
 	 } from '@codemirror/view';
-import { codemirror } from 'codemirror';
 import { showMinimap } from "@replit/codemirror-minimap";
 
 class ObsidianO implements PluginValue {
@@ -19,7 +18,6 @@ class ObsidianO implements PluginValue {
 		let view = new EditorView({
 			doc: "",
 			extensions: [
-			  codemirror,
 			  showMinimap.compute(['doc'], (state) => {
 				return {
 				  create,
