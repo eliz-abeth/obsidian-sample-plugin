@@ -1,38 +1,79 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, ItemView, Modal, WorkspaceLeaf, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { 
 	ViewUpdate,
 	PluginValue,
 	EditorView,
 	ViewPlugin,
 	 } from '@codemirror/view';
+import { syntaxTree } from "@codemirror/language";
 import { showMinimap } from "@replit/codemirror-minimap";
+import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
 
-class ObsidianO implements PluginValue {
-	constructor(view: EditorView) {
+export const MINIMAP = "minimap-view";
+export default class ObsidianO extends Plugin {
+	async onload () {
+			this.registerView(MINIMAP, () => new MinimapView());
+	}
+async onunload() {
+
+}
+async activateView() {
+	const { workspace } = this.app;
+
+	let leaf: WorkspaceLeaf | null = null;
+    const leaves = workspace.getLeavesOfType(MINIMAP);
+
+    if (leaves.length > 0) {
+      // A leaf with our view already exists, use that
+      leaf = leaves[0];
+    } else {
+      // Our view could not be found in the workspace, create a new leaf
+      // in the right sidebar for it
+      leaf = workspace.getRightLeaf(false);
+      await leaf.setViewState({ type: MINIMAP, active: true });
+    }
+
+    // "Reveal" the leaf in case it is in a collapsed sidebar
+    workspace.revealLeaf(leaf);
+  }
+}
+
+
+}
+
+
+
+constructor: let view = new EditorView({
+	doc: "",
+	extensions: [
+	  showMinimap.compute(['doc'], (state) => {
+		return {
+		  createEl,
+		  /* optional */
+		  displayText: 'blocks',
+		  showOverlay: 'always',
+		  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
+		}
+	  }),
+	],
+	parent: document.querySelector('#editor'),
+  })
+export class ObsidianO implements showMinimap {
+	toDOM(view: EditorView): HTMLElement {
+		const div = document.createElement("span");
 		let create = (v: EditorView) => {
 			const dom = document.createElement('div');
 			return { dom }
-		  }
-		}
+	}
+class ObsidianO implements PluginValue {
+	constructor(view: EditorView) {
+	}
 	update(update: ViewUpdate) {
-		let view = new EditorView({
-			doc: "",
-			extensions: [
-			  showMinimap.compute(['doc'], (state) => {
-				return {
-				  create,
-				  /* optional */
-				  displayText: 'blocks',
-				  showOverlay: 'always',
-				  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
-				}
-			  }),
-			],
-			parent: document.querySelector('#editor'),
-		  })
+		if (update.docChanged || update.viewportChanged) {
+			this.
+		}
 	}
-	}
-export const obsidianO = ViewPlugin.fromClass(ObsidianO);
+export const obsidianO = showMinimap.fromClass(ObsidianO);
 
 
 // Remember to rename these classes and interfaces!

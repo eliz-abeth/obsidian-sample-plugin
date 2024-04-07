@@ -3,9 +3,9 @@
 	"name": "Minimap O",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
+	"description": "Minimap view for Obsidian.md.",
 	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
+	"authorUrl": "https://eliz-abeth.github.com",
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }
