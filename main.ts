@@ -10,31 +10,66 @@ import { codemirror } from "node_modules/codemirror"
 import { showMinimap } from "@replit/codemirror-minimap";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
 
+const 
+export class ObsidianO extends Plugin{
+	async onload() {
+		const ext = this.buildObsidianOPlugin();
+		this.registerEditorExtension(ext);
+	}
 
-Workspace.updateOptions(cm6Config);
+	buildObsidianOPlugin() {
 
-let cm6Config = [
-	{
-					extensions: [
-						codemirror,
-					  showMinimap.compute(['doc'], (state) => {
-						return {
-						  create,
-						  /* optional */
-						  displayText: 'blocks',
-						  showOverlay: 'always',
-						  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
-						}
-					},
-					  },
-					],
-					parent: document.querySelector('#editor'),
-				  })
-			}) 
-		]
-	},
-];
-export default class ObsidianO extends showMinimap {
+		let create = (v: EditorView) => {
+			const dom = document.createElement('div');
+			return { dom }
+		}
+
+		let view = new EditorView({
+			doc: "",
+			extensions: [
+				showMinimap.compute(['doc'], (state) => {
+					return {
+						create,
+        /* optional */
+        displayText: 'blocks',
+        showOverlay: 'always',
+        gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
+      }
+    }),
+  ],
+  parent: document.querySelector('#editor'),
+})
+	}
+	constructor(
+		app: App, 
+		view: EditorView, 
+		plugin: ObsidianO
+		) {
+		super(app, plugin);
+		}
+		this.plugin = plugin;	
+	),
+		toDOM(view: EditorView): HTMLElement {
+			const div = document.createElement("span");
+			let create = (v: EditorView) => {
+				const dom = document.createElement('div');
+				return { dom }
+		}
+	public settings: ObsidianOSettings;
+	private cmExtension: Extension[ codemirror,
+		showMinimap.compute(['doc'], (state) => {
+		  return {
+			create,
+			/* optional */
+			displayText: 'blocks',
+			showOverlay: 'always',
+			gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
+	  parent: document.querySelector('#editor'),],
+	})
+
+	async onload(): Promise<void> {}
+	]
+}
 
 
 onload () {
@@ -103,21 +138,6 @@ constructor: let view = new EditorView({
 	],
 	parent: document.querySelector('#editor'),
   })
-export class ObsidianO implements showMinimap {
-	toDOM(view: EditorView): HTMLElement {
-		const div = document.createElement("span");
-		let create = (v: EditorView) => {
-			const dom = document.createElement('div');
-			return { dom }
-	}
-class ObsidianO implements PluginValue {
-	constructor(view: EditorView) {
-	}
-	update(update: ViewUpdate) {
-		if (update.docChanged || update.viewportChanged) {
-			this.
-		}
-	}
 
 
 
