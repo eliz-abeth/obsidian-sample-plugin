@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, ItemView, Modal, WorkspaceLeaf, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, ItemView, Modal, Workspace, WorkspaceLeaf, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { 
 	ViewUpdate,
 	PluginValue,
@@ -6,8 +6,42 @@ import {
 	ViewPlugin,
 	 } from '@codemirror/view';
 import { syntaxTree } from "@codemirror/language";
+import { codemirror } from "node_modules/codemirror"
 import { showMinimap } from "@replit/codemirror-minimap";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
+
+let create = (v: EditorView) => {
+			const dom = document.createElement('div');
+			return { dom };
+		  } 
+		  new EditorView({
+			doc: "",);
+
+let showMinimap = new EditorView
+let cm6Config = [
+	{
+					extensions: [
+						codemirror,
+					  showMinimap.compute(['doc'], (state) => {
+						return {
+						  create,
+						  /* optional */
+						  displayText: 'blocks',
+						  showOverlay: 'always',
+						  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
+						}
+					}
+					  }),
+					],
+					parent: document.querySelector('#editor'),
+				  })
+			}) 
+		]
+	},
+];
+
+Workspace.updateOptions(cm6Config);
+
 
 export const MINIMAP = "minimap-view";
 export default class ObsidianO extends Plugin {
@@ -73,7 +107,7 @@ class ObsidianO implements PluginValue {
 			this.
 		}
 	}
-export const obsidianO = showMinimap.fromClass(ObsidianO);
+
 
 
 // Remember to rename these classes and interfaces!
