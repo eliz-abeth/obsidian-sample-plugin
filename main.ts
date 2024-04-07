@@ -14,7 +14,7 @@ class ObsidianO implements PluginValue {
 			const dom = document.createElement('div');
 			return { dom }
 		  }
-
+		}
 	update(update: ViewUpdate) {
 		let view = new EditorView({
 			doc: "",
@@ -32,27 +32,23 @@ class ObsidianO implements PluginValue {
 			],
 			parent: document.querySelector('#editor'),
 		  })
-
 	}
-		  
 	}
-}
-
 export const obsidianO = ViewPlugin.fromClass(ObsidianO);
 
 
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
+interface ObsidianOSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: ObsidianOSettings = {
 	mySetting: 'default'
 }
 
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+	settings: ObsidianOSettings;
 
 	async onload() {
 		await this.loadSettings();
