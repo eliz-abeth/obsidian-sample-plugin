@@ -1,4 +1,45 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { 
+	ViewUpdate,
+	PluginValue,
+	EditorView,
+	ViewPlugin,
+	 } from '@codemirror/view';
+import { codemirror } from 'codemirror';
+import { showMinimap } from "@replit/codemirror-minimap";
+
+class ObsidianO implements PluginValue {
+	constructor(view: EditorView) {
+		let create = (v: EditorView) => {
+			const dom = document.createElement('div');
+			return { dom }
+		  }
+
+	update(update: ViewUpdate) {
+		let view = new EditorView({
+			doc: "",
+			extensions: [
+			  codemirror,
+			  showMinimap.compute(['doc'], (state) => {
+				return {
+				  create,
+				  /* optional */
+				  displayText: 'blocks',
+				  showOverlay: 'always',
+				  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
+				}
+			  }),
+			],
+			parent: document.querySelector('#editor'),
+		  })
+
+	}
+		  
+	}
+}
+
+export const obsidianO = ViewPlugin.fromClass(ObsidianO);
+
 
 // Remember to rename these classes and interfaces!
 
