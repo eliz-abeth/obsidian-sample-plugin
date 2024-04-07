@@ -1,11 +1,11 @@
 {
-	"id": "test-plugin",
-	"name": "Test Plugin",
+	"id": "Minimap-Plugin",
+	"name": "Minimap",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
+	"description": "Creates a minimap in editor view.",
+	"author": "eliz-abeth",
+	"authorUrl": "https://eliz-abeth.gihub.com",
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }

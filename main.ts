@@ -1,17 +1,220 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
+import {
+	ViewUpdate,
+	PluginValue,
+	EditorView,
+	drawSelection,
+	ViewPlugin,
+} from "@codemirror/view"
+import { EditorState, Compartment, StateEffect, StateField } from "@codemirror/state";
+import { basicSetup } from "codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { linter, Diagnostic } from "@codemirror/lint";
+
+import snippets from "./snippets";
+import { showMinimap } from "src/index.ts";
+
+const BasicExtensions = [
+	basicSetup,
+	javascript(),
+	drawSelection(),
+	EditorState.allowMultipleSelections.of(true),
+	EditorView.contentAttributes.of({
+	  /* Disabling grammarly */
+	  "data-gramm": "false",
+	  "data-gramm_editor": "false",
+	  "data-enabled-grammarly": "false",
+	})
+  ]
+
+  class MinimapPlugin implements PluginValue {
+	constructor(view: EditorView) {
+	  // ...
+	}
+
+	update(update: ViewUpdate) {
+		// ...
+	  }
+	
+	  destroy() {
+		// ...
+	  }
+	}
+	
+	export const minimapPlugin = ViewPlugin.fromClass(MinimapPlugin);
+
+  const setShownState = StateEffect.define<boolean>();
+  const shownState = StateField.define<boolean>({
+	create: () => getShowMinimap(window.location.hash),
+	update: (v, tr) => {
+	  for (const ef of tr.effects) {
+		if (ef.is(setShownState)) {
+		  v = ef.value;
+		}
+	  }
+	  return v;
+	}
+  });
+  
+  const setOverlayState = StateEffect.define<"always" | "mouse-over" | undefined>();
+  const overlayState = StateField.define<"always" | "mouse-over" | undefined>({
+	create: () => getShowOverlay(window.location.hash),
+	update: (v, tr) => {
+	  for (const ef of tr.effects) {
+		if (ef.is(setOverlayState)) {
+		  v = ef.value;
+		}
+	  }
+	  return v;
+	}
+  });
+  
+  const setDisplayTextState = StateEffect.define<"blocks" | "characters" | undefined>();
+  const displayTextState = StateField.define<"blocks" | "characters" | undefined>({
+	create: () => getDisplayText(window.location.hash),
+	update: (v, tr) => {
+	  for (const ef of tr.effects) {
+		if (ef.is(setDisplayTextState)) {
+		  v = ef.value;
+		}
+	  }
+	  return v;
+	}
+  });
+  
+  const wrapCompartment = new Compartment();
+  function maybeWrap() {
+	return getLineWrap(window.location.hash) ? EditorView.lineWrapping : []
+  }
+  
+  const diffState = StateField.define<{ original: string, changes: Array<Change> }>({
+	create: state => ({ original: state.doc.toString(), changes: [] }),
+	update: (value, tr) => {
+	  if (!tr.docChanged) {
+		return value;
+	  }
+  
+	  return {
+		original: value.original,
+		changes: Array.from(diff(value.original, tr.state.doc.toString()))
+	  };
+	}
+  });
+  
+  
+  const view = new EditorView({
+	state: EditorState.create({
+	  doc: getDoc(window.location.hash),
+	  extensions: [
+		BasicExtensions,
+  
+		[
+		  shownState,
+		  diffState,
+		  overlayState,
+		  displayTextState,
+		  wrapCompartment.of(maybeWrap()),
+		],
+  
+		showMinimap.compute([shownState, diffState, overlayState, displayTextState], (s) => {
+		  if (!s.field(shownState, false)) {
+			return null;
+		  }
+  
+		  const create = () => {
+			const dom = document.createElement('div');
+			return { dom };
+		  }
+  
+		  const showOverlay = s.field(overlayState, false);
+		  const displayText = s.field(displayTextState, false);
+  
+		  // TODO convert diffState -> changed line information
+		  // I'm just mocking this in for now
+		  const gutter: Record<number, string> = {};
+		  for (let i = 0; i < s.doc.lines; i++) {
+			gutter[i] = 'green'
+		  }
+  
+		  return { create, showOverlay, displayText, gutters: [gutter] }
+		}),
+	  ],
+	}),
+	parent: document.getElementById("editor") as HTMLElement,
+  });
+  
+  /* Listen to changes and apply updates from controls */
+  window.addEventListener("hashchange", (e: HashChangeEvent) => {
+	view.dispatch({
+	  changes: { from: 0, to: view.state.doc.length, insert: getDoc(e.newURL) },
+	  effects: [
+		setShownState.of(getShowMinimap(e.newURL)),
+		setOverlayState.of(getShowOverlay(e.newURL)),
+		setDisplayTextState.of(getDisplayText(e.newURL)),
+		wrapCompartment.reconfigure(maybeWrap()),
+	  ]
+	})
+  });
+  
+  
+  /* Helpers */
+  function getDoc(url: string): string {
+	const length = getHashValue("length", url);
+  
+	if (length && length in snippets) {
+	  return snippets[length];
+	}
+  
+	return snippets.long;
+  }
+  function getShowMinimap(url: string): boolean {
+	return getHashValue("minimap", url) !== "hide";
+  }
+  function getShowOverlay(url: string): "always" | "mouse-over" | undefined {
+	const value = getHashValue("overlay", url);
+	if (value === "always" || value === "mouse-over") {
+	  return value;
+	}
+  
+	return undefined;
+  }
+  function getDisplayText(url: string): "blocks" | "characters" | undefined {
+	const value = getHashValue("text", url);
+	if (value === "blocks" || value === "characters") {
+	  return value;
+	}
+  
+	return undefined;
+  }
+  function getLineWrap(url: string): boolean {
+	const value = getHashValue("wrapping", url);
+	return value == "wrap";
+  }
+  function getMode(url: string): "dark" | "light" {
+	return getHashValue("mode", url) === "dark" ? "dark" : "light";
+  }
+  function getLintingEnabled(url: string): boolean {
+	return getHashValue("linting", url) === "disabled" ? false : true;
+  }
+  function getHashValue(key: string, url: string): string | undefined {
+	const hash = url.split("#").slice(1);
+	const pair = hash.find((kv) => kv.startsWith(`${key}=`));
+	return pair ? pair.split("=").slice(1)[0] : undefined;
+  }
+
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
+interface MinimapPluginSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: MinimapPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class HelloWorldPlugin extends Plugin {
+	settings: MinimapPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -21,6 +224,11 @@ export default class MyPlugin extends Plugin {
 			// Called when the user clicks the icon.
 			new Notice('This is a notice!');
 		});
+
+		this.addRibbonIcon('dice', 'Greet', () => {
+			new Notice('Hello, world!');
+		  });
+
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
