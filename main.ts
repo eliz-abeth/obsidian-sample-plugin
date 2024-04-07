@@ -5,6 +5,8 @@ import {
 	EditorView,
 	ViewPlugin,
 	 } from '@codemirror/view';
+	// @ts-expect-error, not typed
+const editorView = view.editor.cm as EditorView;
 import { syntaxTree } from "@codemirror/language";
 import { CodeMirror } from "codemirror";
 import { showMinimap } from "@replit/codemirror-minimap";
@@ -15,13 +17,13 @@ Workspace.updateOptions(): void;
 
 
 const 
-export class ObsidianO extends Plugin{
+export class MinimapO extends Plugin{
 	async onload() {
-		const ext = this.buildObsidianOPlugin();
-		this.registerEditorExtension(ext);
+		const ext = this.buildMinimapOPlugin();
+		this.registerEditorExtension(MinimapO);
 	}
 
-	buildObsidianOPlugin() {
+	buildMinimapOPlugin() {
 
 		let create = (v: EditorView) => {
 			const dom = document.createElement('div');
@@ -47,7 +49,23 @@ this.registerView(
 	VIEW_TYPE_EXAMPLE,
 	(leaf) => new MinimapView(leaf,)
 )
-export class MinimapView extends ItemView {
+
+class MinimapO implements PluginValue {
+	constructor(view: EditorView) {
+
+	}
+
+	update(update: ViewUpdate) {
+
+	}
+
+	destroy() {
+
+	}
+}
+
+export const minimapO = ViewPlugin.fromClass(MinimapO);
+export class MinimapView extends EditorView {
 	constructor(leaf: WorkspaceLeaf, param: type_of_param) {
 		super(leaf);
 		this.param=param;
@@ -70,22 +88,22 @@ onload (){
 
 // Remember to rename these classes and interfaces!
 
-interface ObsidianOSettings {
+interface MinimapOSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: ObsidianOSettings = {
+const DEFAULT_SETTINGS: MinimapOSettings = {
 	mySetting: 'default'
 }
 
 export default class MyPlugin extends Plugin {
-	settings: ObsidianOSettings;
+	settings: MinimapOSettings;
 
 	async onload() {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
+		const ribbonIconEl = this.addRibbonIcon('dice', 'Minimap O', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			new Notice('This is a notice!');
 		});
@@ -98,40 +116,19 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
+			id: 'open-minimap',
+			name: 'Open minimap',
+			editorCallback: (editor, view) => {
+
+		// @ts-expect-error, not typed
+		const editorView = view.editor.cm as EditorView;
+
+		const plugin = editorView.plugin(minimapO);
+		if (plugin) {
+			plugin.addPointerToSelection(editorView);
 				new SampleModal(this.app).open();
 			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
-		});
+		},});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
