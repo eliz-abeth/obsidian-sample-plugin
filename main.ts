@@ -11,6 +11,8 @@ import { showMinimap } from "@replit/codemirror-minimap";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
 
 Plugin.registerEditorExtension(showMinimap: Codemirror Minimap); void;
+Workspace.updateOptions(): void;
+
 
 const 
 export class ObsidianO extends Plugin{
