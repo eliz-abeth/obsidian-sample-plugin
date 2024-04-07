@@ -10,14 +10,9 @@ import { codemirror } from "node_modules/codemirror"
 import { showMinimap } from "@replit/codemirror-minimap";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
 
-let create = (v: EditorView) => {
-			const dom = document.createElement('div');
-			return { dom };
-		  } 
-		  new EditorView({
-			doc: "",);
 
-let showMinimap = new EditorView
+Workspace.updateOptions(cm6Config);
+
 let cm6Config = [
 	{
 					extensions: [
@@ -30,8 +25,8 @@ let cm6Config = [
 						  showOverlay: 'always',
 						  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
 						}
-					}
-					  }),
+					},
+					  },
 					],
 					parent: document.querySelector('#editor'),
 				  })
@@ -39,16 +34,32 @@ let cm6Config = [
 		]
 	},
 ];
+export default class ObsidianO extends showMinimap {
 
-Workspace.updateOptions(cm6Config);
 
+onload () {
+	console.log ('loading plugin: Minimap O');
 
-export const MINIMAP = "minimap-view";
-export default class ObsidianO extends Plugin {
-	async onload () {
-			this.registerView(MINIMAP, () => new MinimapView());
-	}
-async onunload() {
+	this.addCommand({
+		id:'view-minimap',
+		name: 'View Minimap',
+		checkCallback: (checking: bollean) => {
+			let active = this.app.workspace.aftiveLeaf;
+			if (active) {
+			let create = (v: EditorView) => {
+				const dom = document.createElement('div');
+				return { dom };
+			  } 
+			  new EditorView({
+				doc: "",);
+			let showMinimap = new EditorView;
+
+		}
+	});
+	this.registerView(MINIMAP, () => new MinimapView());
+
+}
+
 
 }
 async activateView() {
