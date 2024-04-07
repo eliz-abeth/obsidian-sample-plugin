@@ -6,9 +6,11 @@ import {
 	ViewPlugin,
 	 } from '@codemirror/view';
 import { syntaxTree } from "@codemirror/language";
-import { codemirror } from "node_modules/codemirror"
+import { CodeMirror } from "codemirror";
 import { showMinimap } from "@replit/codemirror-minimap";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
+
+Plugin.registerEditorExtension(showMinimap: Codemirror Minimap); void;
 
 const 
 export class ObsidianO extends Plugin{
@@ -26,7 +28,7 @@ export class ObsidianO extends Plugin{
 
 		let view = new EditorView({
 			doc: "",
-			extensions: [
+			extensions: [ CodeMirror,
 				showMinimap.compute(['doc'], (state) => {
 					return {
 						create,
@@ -39,107 +41,30 @@ export class ObsidianO extends Plugin{
   ],
   parent: document.querySelector('#editor'),
 })
+this.registerView(
+	VIEW_TYPE_EXAMPLE,
+	(leaf) => new MinimapView(leaf,)
+)
+export class MinimapView extends ItemView {
+	constructor(leaf: WorkspaceLeaf, param: type_of_param) {
+		super(leaf);
+		this.param=param;
 	}
-	constructor(
-		app: App, 
-		view: EditorView, 
-		plugin: ObsidianO
-		) {
-		super(app, plugin);
-		}
-		this.plugin = plugin;	
-	),
-		toDOM(view: EditorView): HTMLElement {
-			const div = document.createElement("span");
-			let create = (v: EditorView) => {
-				const dom = document.createElement('div');
-				return { dom }
-		}
-	public settings: ObsidianOSettings;
-	private cmExtension: Extension[ codemirror,
-		showMinimap.compute(['doc'], (state) => {
-		  return {
-			create,
-			/* optional */
-			displayText: 'blocks',
-			showOverlay: 'always',
-			gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
-	  parent: document.querySelector('#editor'),],
-	})
+}
+	}
 
-	async onload(): Promise<void> {}
-	]
+	getDisplayName(): string {
+		return "Show Minimap";
+	  };
+	  getIcon(): string {
+		return "apple";
+	  }
 }
 
-
-onload () {
+onload (){
 	console.log ('loading plugin: Minimap O');
-
-	this.addCommand({
-		id:'view-minimap',
-		name: 'View Minimap',
-		checkCallback: (checking: bollean) => {
-			let active = this.app.workspace.aftiveLeaf;
-			if (active) {
-			let create = (v: EditorView) => {
-				const dom = document.createElement('div');
-				return { dom };
-			  } 
-			  new EditorView({
-				doc: "",);
-			let showMinimap = new EditorView;
-
-		}
-	});
-	this.registerView(MINIMAP, () => new MinimapView());
-
+	registerView(type: string, viewCreator: ViewCreator): void;
 }
-
-
-}
-async activateView() {
-	const { workspace } = this.app;
-
-	let leaf: WorkspaceLeaf | null = null;
-    const leaves = workspace.getLeavesOfType(MINIMAP);
-
-    if (leaves.length > 0) {
-      // A leaf with our view already exists, use that
-      leaf = leaves[0];
-    } else {
-      // Our view could not be found in the workspace, create a new leaf
-      // in the right sidebar for it
-      leaf = workspace.getRightLeaf(false);
-      await leaf.setViewState({ type: MINIMAP, active: true });
-    }
-
-    // "Reveal" the leaf in case it is in a collapsed sidebar
-    workspace.revealLeaf(leaf);
-  }
-}
-
-
-}
-
-
-
-constructor: let view = new EditorView({
-	doc: "",
-	extensions: [
-	  showMinimap.compute(['doc'], (state) => {
-		return {
-		  createEl,
-		  /* optional */
-		  displayText: 'blocks',
-		  showOverlay: 'always',
-		  gutters: [ { 1: '#00FF00', 2: '#00FF00' } ],
-		}
-	  }),
-	],
-	parent: document.querySelector('#editor'),
-  })
-
-
 
 // Remember to rename these classes and interfaces!
 
