@@ -18,7 +18,7 @@ Workspace.updateOptions(): void;
 
 const 
 export class MinimapO extends Plugin{
-	async onload() {
+	onload() {
 		const ext = this.buildMinimapOPlugin();
 		this.registerEditorExtension(MinimapO);
 	}
@@ -86,6 +86,21 @@ onload (){
 	registerView(type: string, viewCreator: ViewCreator): void;
 }
 
+this.addCommand({
+	id: 'open-minimap',
+	name: 'Open minimap',
+	editorCallback: (editor, view) => {
+
+// @ts-expect-error, not typed
+const editorView = view.editor.cm as EditorView;
+
+const plugin = editorView.plugin(minimapO);
+if (plugin) {
+	plugin.addPointerToSelection(editorView);
+		new SampleModal(this.app).open();
+	}
+},});
+
 // Remember to rename these classes and interfaces!
 
 interface MinimapOSettings {
@@ -113,22 +128,6 @@ export default class MyPlugin extends Plugin {
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-minimap',
-			name: 'Open minimap',
-			editorCallback: (editor, view) => {
-
-		// @ts-expect-error, not typed
-		const editorView = view.editor.cm as EditorView;
-
-		const plugin = editorView.plugin(minimapO);
-		if (plugin) {
-			plugin.addPointerToSelection(editorView);
-				new SampleModal(this.app).open();
-			}
-		},});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
