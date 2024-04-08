@@ -50,6 +50,18 @@ this.registerView(
 	(leaf) => new MinimapView(leaf,)
 )
 
+this.addCommand({
+	id: 'open-minimap',
+	name: 'Open minimap',
+	editorCallback: (editor, view) => {
+
+const plugin = editorView.plugin(minimapO);
+if (plugin) {
+	plugin.addPointerToSelection(editorView);
+		new SampleModal(this.app).open();
+	}
+},});
+
 class MinimapO implements PluginValue {
 	constructor(view: EditorView) {
 
@@ -86,20 +98,7 @@ onload (){
 	registerView(type: string, viewCreator: ViewCreator): void;
 }
 
-this.addCommand({
-	id: 'open-minimap',
-	name: 'Open minimap',
-	editorCallback: (editor, view) => {
 
-// @ts-expect-error, not typed
-const editorView = view.editor.cm as EditorView;
-
-const plugin = editorView.plugin(minimapO);
-if (plugin) {
-	plugin.addPointerToSelection(editorView);
-		new SampleModal(this.app).open();
-	}
-},});
 
 // Remember to rename these classes and interfaces!
 
